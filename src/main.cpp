@@ -54,6 +54,18 @@ int main() {
            */
           double steer_value;
           double throttle_value;
+          Eigen::VectorXd pts_x(ptsx.size());
+          Eigen::VectorXd pts_y(ptsy.size());
+          pts_x << ptsx[0], ptsx[1], ptsx[2], ptsx[3], ptsx[4], ptsx[5];
+          pts_y << ptsy[0], ptsy[1], ptsy[2], ptsy[3], ptsy[4], ptsy[5];
+          auto coeff = polyfit(pts_x, pts_y, 5);
+          double cte = polyeval(coeff, px) - py;
+
+          double derivative = coeff[1] + 2 * coeff[2] * px + 3 * coeff[3] * pow(px, 2) + 4 * coeff[4] * pow(px, 3) + 5 * coeff[5] * pow(px, 4); 
+          double epsi = psi - (atan(derivative));
+
+          Eigen::VectorXd state(6);
+          state << px, py, psi, v, cte, epsi;
 
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the 
