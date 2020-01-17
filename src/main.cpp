@@ -61,7 +61,7 @@ int main() {
           auto coeff = polyfit(pts_x, pts_y, 5);
           double cte = polyeval(coeff, px) - py;
 
-          double derivative = coeff[1] + 2 * coeff[2] * px + 3 * coeff[3] * pow(px, 2) + 4 * coeff[4] * pow(px, 3) + 5 * coeff[5] * pow(px, 4); 
+          double derivative = coeff[1] + 2 * coeff[2] * px + 3 * coeff[3] * pow(px, 2) + 4 * coeff[4] * pow(px, 3) + 5 * coeff[5] * pow(px, 4);
           double epsi = psi - (atan(derivative));
 
           Eigen::VectorXd state(6);
@@ -74,10 +74,16 @@ int main() {
           //   [-deg2rad(25), deg2rad(25] instead of [-1, 1].
           msgJson["steering_angle"] = steer_value;
           msgJson["throttle"] = throttle_value;
+          steer_value = vars[3];
+          throttle_value = vars[7];
+
+          state << vars[0], vars[1], vars[2], vars[3], vars[4], vars[5];
 
           // Display the MPC predicted trajectory 
           vector<double> mpc_x_vals;
           vector<double> mpc_y_vals;
+          mpc_x_vals.push_back(vars[0]);
+          mpc_y_vals.push_back(vars[1]);
 
           /**
            * TODO: add (x,y) points to list here, points are in reference to 
