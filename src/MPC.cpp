@@ -99,7 +99,7 @@ class FG_eval {
       fg[psi_start + t + 1] = psi1 - (psi0 - ((v0 / Lf) * delta0 * dt));
       fg[v_start + t + 1] = v1 - (v0 + (a0 * dt));
       fg[cte_start + t + 1] = cte1 - ((func - y0) + (v0 * CppAD::sin(epsi0) * dt));
-      fg[epsi_start + t + 1] = epsi1 - ((psi0 - psi_des) + ((v0 / Lf) * delta0 * dt));
+      fg[epsi_start + t + 1] = epsi1 - ((psi0 - psi_des) - ((v0 / Lf) * delta0 * dt));
     }
   }
 };
@@ -151,8 +151,8 @@ std::vector<double> MPC::Solve(const VectorXd &state, const VectorXd &coeffs) {
    * TODO: Set lower and upper limits for variables.
    */
   for (int i = 0; i < delta_start; i++) {
-    vars_lowerbound[i] = -1.0e-19;
-    vars_upperbound[i] = 1.0e-19;
+    vars_lowerbound[i] = -1.0e19;
+    vars_upperbound[i] = 1.0e19;
   }
 
   for (int i = delta_start; i < a_start; i++) {

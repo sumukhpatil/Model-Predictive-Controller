@@ -54,30 +54,35 @@ int main() {
            */
           double steer_value;
           double throttle_value;
-          Eigen::VectorXd pts_x(ptsx.size());
-          Eigen::VectorXd pts_y(ptsy.size());
-          pts_x << ptsx[0], ptsx[1], ptsx[2], ptsx[3], ptsx[4], ptsx[5];
-          pts_y << ptsy[0], ptsy[1], ptsy[2], ptsy[3], ptsy[4], ptsy[5];
-          auto coeff = polyfit(pts_x, pts_y, 5);
-          double cte = polyeval(coeff, px) - py;
-
-          double derivative = coeff[1] + 2 * coeff[2] * px + 3 * coeff[3] * pow(px, 2) + 4 * coeff[4] * pow(px, 3) + 5 * coeff[5] * pow(px, 4);
+          std::vector<double> pts_x;
+          std::vector<double> pts_y;
+          for (int i = 0; i < ptsx.size(); i++) {
+            double x_diff = ptsx[i] - px;
+            double y_diff = ptsy[i] - py;
+            pts_x.push_back(x_diff * cos(-psi) - y_diff * sin(-psi));
+            pts_y.push_back(x_diff * sin(-psi) + y_diff * cos(-psi));
+          }
+          double* ptrx = &pts_x[0];
+          double* ptry = &pts_y[0];
+          Eigen::Map<Eigen::VectorXd> pts_x_trans(ptrx, 6);
+          Eigen::Map<Eigen::VectorXd> pts_y_trans(ptry, 6);
+          auto coeff = polyfit(pts_x_trans, pts_y_trans, 5);
+          double cte = polyeval(coeff, 0) - 0;
+          double derivative = coeff[1];
           double epsi = psi - (atan(derivative));
 
           Eigen::VectorXd state(6);
-          state << px, py, psi, v, cte, epsi;
+          state << 0, 0, 0, v, cte, epsi;
 
           auto vars = mpc.Solve(state, coeff);
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the 
           //   steering value back. Otherwise the values will be in between 
           //   [-deg2rad(25), deg2rad(25] instead of [-1, 1].
-          msgJson["steering_angle"] = steer_value;
-          msgJson["throttle"] = throttle_value;
-          steer_value = vars[3];
+          steer_value = vars[6];
           throttle_value = vars[7];
-
-          state << vars[0], vars[1], vars[2], vars[3], vars[4], vars[5];
+          msgJson["steering_angle"] = steer_value / (deg2rad(25));
+          msgJson["throttle"] = throttle_value;
 
           // Display the MPC predicted trajectory 
           vector<double> mpc_x_vals;
