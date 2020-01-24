@@ -9,20 +9,15 @@
 using CppAD::AD;
 using Eigen::VectorXd;
 
-/**
- * TODO: Set the timestep length and duration
- */
 size_t N = 20;
 double dt = 0.05;
 
-// This value assumes the model presented in the classroom is used.
-//
-// It was obtained by measuring the radius formed by running the vehicle in the
+// This value was obtained by measuring the radius formed by running the vehicle in the
 //   simulator around in a circle with a constant steering angle and velocity on
 //   a flat terrain.
 //
 // Lf was tuned until the the radius formed by the simulating the model
-//   presented in the classroom matched the previous radius.
+//   matched the previous radius.
 //
 // This is the length from front to CoG that has a similar radius.
 const double Lf = 2.67;
@@ -45,13 +40,7 @@ class FG_eval {
 
   typedef CPPAD_TESTVECTOR(AD<double>) ADvector;
   void operator()(ADvector& fg, const ADvector& vars) {
-    /**
-     * TODO: implement MPC
-     * `fg` is a vector of the cost constraints, `vars` is a vector of variable 
-     *   values (state & actuators)
-     * NOTE: You'll probably go back and forth between this function and
-     *   the Solver function below.
-     */
+
     fg[0] = 0;
     for (int i = 0; i < N; i++) {
       fg[0] += CppAD::pow(vars[cte_start + i], 2);
@@ -120,16 +109,8 @@ std::vector<double> MPC::Solve(const VectorXd &state, const VectorXd &coeffs) {
   double v = state[3];
   double cte = state[4];
   double epsi = state[5];
-  /**
-   * TODO: Set the number of model variables (includes both states and inputs).
-   * For example: If the state is a 4 element vector, the actuators is a 2
-   *   element vector and there are 10 timesteps. The number of variables is:
-   *   4 * 10 + 2 * 9
-   */
+
   size_t n_vars = 6 * N + 2 * (N - 1);
-  /**
-   * TODO: Set the number of constraints
-   */
   size_t n_constraints = 6 * N;
 
   // Initial value of the independent variables.
@@ -147,9 +128,7 @@ std::vector<double> MPC::Solve(const VectorXd &state, const VectorXd &coeffs) {
 
   Dvector vars_lowerbound(n_vars);
   Dvector vars_upperbound(n_vars);
-  /**
-   * TODO: Set lower and upper limits for variables.
-   */
+
   for (int i = 0; i < delta_start; i++) {
     vars_lowerbound[i] = -1.0e19;
     vars_upperbound[i] = 1.0e19;
@@ -221,12 +200,5 @@ std::vector<double> MPC::Solve(const VectorXd &state, const VectorXd &coeffs) {
   auto cost = solution.obj_value;
   std::cout << "Cost " << cost << std::endl;
 
-  /**
-   * TODO: Return the first actuator values. The variables can be accessed with
-   *   `solution.x[i]`.
-   *
-   * {...} is shorthand for creating a vector, so auto x1 = {1.0,2.0}
-   *   creates a 2 element double vector.
-   */
   return {solution.x[x_start + 1], solution.x[y_start + 1], solution.x[psi_start + 1], solution.x[v_start + 1], solution.x[cte_start + 1], solution.x[epsi_start + 1], solution.x[delta_start], solution.x[a_start]};
 }

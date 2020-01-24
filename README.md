@@ -7,8 +7,8 @@ A model predictive controller (MPC) controls the process variable while satisfyi
 ## Project Build Instructions
 ### Ubuntu
 ``` bash
-git clone
-cd
+git clone https://github.com/sumukhpatil/Model-Predictive-Controller.git
+cd Model-Predictive-Controller
 mkdir build && cd build
 cmake ..
 make
